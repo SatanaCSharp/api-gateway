@@ -1,0 +1,35 @@
+version: '3.9'
+
+services:
+  server:
+    container_name: cpm-api-gateway
+    image: cpm-api-gateway:latest
+    working_dir: /var/www/html/app
+    build:
+      context: ../../
+      dockerfile: Dockerfile
+      target: development
+    command: >
+      sh -c "
+      echo cpm-api-gateway has been started!;
+      pnpm install --quiet;
+      pnpm start:dev
+      "
+    volumes:
+      - ../../src:/var/www/html/app/src:cached
+      - ../../test:/var/www/html/app/test:ro
+      - ../../package.json:/var/www/html/app/package.json:ro
+      - ../../tsconfig.build.json:/var/www/html/app/tsconfig.build.json:ro
+      - ../../tsconfig.json:/var/www/html/app/tsconfig.json:ro
+    env_file:
+      - .env
+
+    ports:
+      - ${PORT}:${PORT}
+      - ${DEBUG_PORT}:${DEBUG_PORT}
+    networks:
+      - public
+networks:
+  public:
+    external:
+      name: public
